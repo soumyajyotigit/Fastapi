@@ -1,12 +1,15 @@
-from app.core.config import settings
-from app.db.session import get_db
+from typing import AsyncGenerator
+
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from app.db.session import AsyncSessionLocal
 
 
-def get_settings():
-    return settings
+async def get_db() -> AsyncGenerator[
+    AsyncSession,
+    None,
+]:
 
+    async with AsyncSessionLocal() as session:
 
-__all__ = [
-    "get_settings",
-    "get_db",
-]
+        yield session
