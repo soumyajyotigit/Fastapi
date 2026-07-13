@@ -190,17 +190,20 @@ docker compose up --build
 
 ## GitHub Actions deployment
 
-Two workflows are included in `.github/workflows`:
+Two image-build workflows are included in `.github/workflows`:
 
-- **Build and deploy development** runs on pushes to `develop` and `soumya-draft` (and can be started manually).
-- **Build and deploy production** runs on pushes to `main` (and can be started manually).
+- **Build development image** runs on pushes to `develop` and `soumya-draft` (and can be started manually).
+- **Build production image** runs on pushes to `main` (and can be started manually).
 
-Each workflow builds the API image, pushes it to GitHub Container Registry as
-`ghcr.io/<owner>/fastapi:<commit-sha>`, then connects to the selected server and
-restarts the API with that exact image.
+Each workflow builds the API image and pushes it to GitHub Container Registry as
+`ghcr.io/<owner>/fastapi:<commit-sha>`.
 
-Before the first deployment, create GitHub environments named `development` and
-`production`, then add these environment secrets to each one:
+For an SSH/Docker server deployment, add a separate deployment job with the
+appropriate server credentials. When using Render, connect Render to the GitHub
+repository and enable auto-deploy; Render builds and deploys the Dockerfile on
+each push, so no SSH credentials or GitHub environment secrets are required.
+
+The previously documented SSH deployment requires these environment secrets:
 
 | Secret | Description |
 | --- | --- |
@@ -211,7 +214,7 @@ Before the first deployment, create GitHub environments named `development` and
 | `DEPLOY_PATH` | Absolute server directory containing `docker-compose.yml` and its `.env`. |
 | `GHCR_READ_TOKEN` | GitHub PAT with `read:packages` permission, used by the server to pull the image. |
 
-The deployment server must have Docker Compose installed and a copy of this
+An SSH deployment server must have Docker Compose installed and a copy of this
 repository's `docker-compose.yml` plus its environment-specific `.env` file at
 `DEPLOY_PATH`. If the GHCR package is private, grant the PAT access to it.
 

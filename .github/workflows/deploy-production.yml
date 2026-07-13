@@ -1,4 +1,4 @@
-name: Build and deploy production
+name: Build production image
 
 on:
   push:
@@ -22,8 +22,6 @@ jobs:
   build:
     name: Build and publish image
     runs-on: ubuntu-latest
-    outputs:
-      image: ${{ steps.image.outputs.image }}
     steps:
       - uses: actions/checkout@v4
 
@@ -46,33 +44,3 @@ jobs:
             ${{ env.IMAGE_NAME }}:production
           cache-from: type=gha
           cache-to: type=gha,mode=max
-
-      - id: image
-        name: Set deployed image
-        run: echo "image=${{ env.IMAGE_NAME }}:${{ github.sha }}" >> "$GITHUB_OUTPUT"
-
-  deploy:
-    name: Deploy production
-    needs: build
-    runs-on: ubuntu-latest
-    environment: production
-    steps:
-      - name: Pull and start the production release
-        uses: appleboy/ssh-action@v1.0.3
-        env:
-          API_IMAGE: ${{ needs.build.outputs.image }}
-          DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
-          GHCR_USERNAME: ${{ github.actor }}
-          GHCR_TOKEN: ${{ secrets.GHCR_READ_TOKEN }}
-        with:
-          host: ${{ secrets.DEPLOY_HOST }}
-          username: ${{ secrets.DEPLOY_USER }}
-          key: ${{ secrets.DEPLOY_SSH_KEY }}
-          port: ${{ secrets.DEPLOY_PORT || '22' }}
-          envs: API_IMAGE,DEPLOY_PATH,GHCR_USERNAME,GHCR_TOKEN
-          script: |
-            set -eu
-            cd "$DEPLOY_PATH"
-            echo "$GHCR_TOKEN" | docker login ghcr.io -u "$GHCR_USERNAME" --password-stdin
-            API_IMAGE="$API_IMAGE" docker compose pull api
-            API_IMAGE="$API_IMAGE" docker compose up -d --no-build --remove-orphans
