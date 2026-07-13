@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
     inputs:
       image_tag:
-        description: Optional additional Docker image tag (for example, v1.0.0)
+        description: Optional Docker image tag (for example, v1.0.0)
         required: false
         type: string
 
