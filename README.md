@@ -17,6 +17,10 @@ Enterprise FastAPI provides a clean foundation for building production-style API
 
 This project is ideal for developers who want a strong backend base for SaaS products, internal tools, or AI-powered applications.
 
+## Live Deployment
+
+The application is deployed on Render: [https://fastapi-soumya.onrender.com](https://fastapi-soumya.onrender.com)
+
 ## Current Features
 
 ### Core API Capabilities
