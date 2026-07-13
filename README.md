@@ -188,6 +188,36 @@ A Docker-based workflow is supported for future containerized development and de
 docker compose up --build
 ```
 
+## GitHub Actions deployment
+
+Two image-build workflows are included in `.github/workflows`:
+
+- **Build development image** runs on pushes to `develop` and `soumya-draft` (and can be started manually).
+- **Build production image** runs on pushes to `main` (and can be started manually).
+
+Each workflow builds the API image and pushes it to GitHub Container Registry as
+`ghcr.io/<owner>/fastapi:<commit-sha>`.
+
+For an SSH/Docker server deployment, add a separate deployment job with the
+appropriate server credentials. When using Render, connect Render to the GitHub
+repository and enable auto-deploy; Render builds and deploys the Dockerfile on
+each push, so no SSH credentials or GitHub environment secrets are required.
+
+The previously documented SSH deployment requires these environment secrets:
+
+| Secret | Description |
+| --- | --- |
+| `DEPLOY_HOST` | Server hostname or IP address. |
+| `DEPLOY_PORT` | SSH port (optional; defaults to `22`). |
+| `DEPLOY_USER` | SSH user that can run Docker. |
+| `DEPLOY_SSH_KEY` | Private SSH key for `DEPLOY_USER`. |
+| `DEPLOY_PATH` | Absolute server directory containing `docker-compose.yml` and its `.env`. |
+| `GHCR_READ_TOKEN` | GitHub PAT with `read:packages` permission, used by the server to pull the image. |
+
+An SSH deployment server must have Docker Compose installed and a copy of this
+repository's `docker-compose.yml` plus its environment-specific `.env` file at
+`DEPLOY_PATH`. If the GHCR package is private, grant the PAT access to it.
+
 ## Development Notes
 
 The current codebase follows a scalable pattern:
