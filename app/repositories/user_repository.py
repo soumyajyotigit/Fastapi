@@ -55,3 +55,14 @@ class UserRepository:
         await db.refresh(user)
 
         return user
+
+    @staticmethod
+    async def authenticate(
+            db,
+            email: str,
+    ):
+        result = await db.execute(
+            select(User).where(User.email == email)
+        )
+
+        return result.scalar_one_or_none()
