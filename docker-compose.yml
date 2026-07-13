@@ -3,7 +3,9 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    image: fastapi-project:latest
+    # CI/CD supplies API_IMAGE with the immutable image tag to deploy.
+    # The default keeps local `docker compose up --build` unchanged.
+    image: ${API_IMAGE:-fastapi-project:latest}
     env_file:
       - .env
     environment:
